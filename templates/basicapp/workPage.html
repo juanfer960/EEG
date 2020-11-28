@@ -1,0 +1,465 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block body_block %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<br/>
+<br/>
+<h2>Inventario de análisis realizados</h2>
+<h6>Los análisis marcados en rojo representan posibles casos de síndrome de WEST</h6>
+<br/>
+
+<!-- Modal -->
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header" id='plotname_'>
+        <script languaje="javascript" type="text/javascript">
+          var html_Plot = '<input type="text" id="fname" name="fname">';
+          $('#plotname_').append(html_Plot);
+          $(fname).hide();
+       </script>
+        <h5 class="modal-title" id="exampleModalLabel">EEG</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+        <form method="get" action="{% url 'plot'  user  password  %}" id='plot'>  
+            <div class="form-group" align="center">
+              <img id="image" alt="" height="550" width="900"  />
+            </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Siguiente</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+
+
+<div class="container">
+  <hr>
+  <p>
+    <a  data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+      Filtrar resultados:
+    </a>
+  </p>
+  <!-- Modal -->
+<div class="collapse" id="collapseExample" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Filtrar por Doctor y Paciente</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="{% url 'eegSerch' user  password %}">
+          <table WIDTH="90%">
+            {% csrf_token %}
+            {{ form.as_table }}
+          </table>
+          <br/>
+          <button type="submit" class="btn btn-primary" align="center">Consultar</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div>
+  <hr>
+  <div class="row">
+    {% for dataRes in dataRes_uno %}
+    <script languaje="javascript" type="text/javascript">
+      var con = {{ forloop.counter }};
+      var html = '<input type="text" id="fname'+con+'" name="fname'+con+'">';
+    </script>
+    <div class="card border-success mb-3" style="width: 18rem;">
+      <div class="card-body text-success">
+        <h5 class="card-title">Sin posible evento epilepsia</h5>
+        <p class="card-text">No se identifico un posible evento de epilepsia</p>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for data in dataRes %}
+          <li class="list-group-item">{{data}} </li>
+          <div id='target'></div>
+            {% if 'EGG' in data %}
+            <script languaje="javascript" type="text/javascript">
+              $('#target').append(html);
+              var row_data = "{{ data }}";
+              if($(fname1).val() == ""){
+                $(fname1).val(row_data)
+              }
+              else{
+                if($(fname2).val() == ""){
+                  $(fname2).val(row_data)
+                }
+                else{
+                  $(fname3).val(row_data)
+                }
+              }
+              $(fname1).hide();$(fname2).hide();$(fname3).hide();
+            </script>
+          {% endif %}
+        {% endfor %}
+      </ul>
+      <div id='targetPlot1'></div>
+      <div id='targetPlot2'></div>
+      <div id='targetPlot3'></div>
+      <script languaje="javascript" type="text/javascript">
+        var htmlPlot = "<form method='get' action='{% url 'plot' user  password  %}' id="+
+                          '"plotstart'+con+'">'+ 
+                          "<div class='card-body'>"+
+                            "<button type='submit' data-toggle='modal' data-target='#exampleModal' class='btn btn-primary'>EEG</button>"+
+                          "</div>"+
+                        "</form>"
+        if($("#targetPlot1").html()==""){
+          $('#targetPlot1').append(htmlPlot);
+          $("#targetPlot2").remove();
+          $("#targetPlot3").remove();
+        }
+        else{
+          if($("#targetPlot2").html()==""){
+            $('#targetPlot2').append(htmlPlot);
+            $("#targetPlot3").remove();
+          }
+          else{
+            if($("#targetPlot3").html()==""){
+              $('#targetPlot3').append(htmlPlot);
+            }
+          }
+        }
+        </script>
+    </div>
+    
+    <hr>
+    {% endfor %}
+  </div>
+
+  <div class="row">
+    {% for dataRes in dataRes_dos %}
+    <script languaje="javascript" type="text/javascript">
+      var con = {{ forloop.counter }};
+      con = con + 3;
+      var html = '<input type="text" id="fname'+con+'" name="fname'+con+'">';
+    </script>
+    <div class="card border-warning mb-3" style="width: 18rem;">
+      <div class="card-body text-warning">
+        <h5 class="card-title">Con epilepsia</h5>
+        <p class="card-text">Se identificaron un posible eventos de epliepsia</p>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for data in dataRes %}
+          <li class="list-group-item">{{data}} </li>
+            <div id='target'></div>
+            {% if 'EGG' in data %}
+            <script languaje="javascript" type="text/javascript">
+              $('#target').append(html);
+              var row_data = "{{ data }}";
+              if($(fname4).val() == ""){
+                $(fname4).val(row_data)
+              }
+              else{
+                if($(fname5).val() == ""){
+                  $(fname5).val(row_data)
+                }
+                else{
+                  $(fname6).val(row_data)
+                }
+              }
+              $(fname4).hide();$(fname5).hide();$(fname6).hide();
+            </script>
+          {% endif %}
+        {% endfor %}
+      </ul>
+      <div id='targetPlot4'></div>
+      <div id='targetPlot5'></div>
+      <div id='targetPlot6'></div>
+      <script languaje="javascript" type="text/javascript">
+        var htmlPlot = "<form method='get' action='{% url 'plot' user  password  %}' id="+
+                          '"plotstart'+con+'">'+ 
+                          "<div class='card-body'>"+
+                            "<button type='submit' data-toggle='modal' data-target='#exampleModal' class='btn btn-primary'>EEG</button>"+
+                          "</div>"+
+                        "</form>"
+        if($("#targetPlot4").html()==""){
+          $('#targetPlot4').append(htmlPlot);
+          $("#targetPlot5").remove();
+          $("#targetPlot6").remove();
+        }
+        else{
+          if($("#targetPlot5").html()==""){
+            $('#targetPlot5').append(htmlPlot);
+            $("#targetPlot6").remove();
+          }
+          else{
+            if($("#targetPlot6").html()==""){
+              $('#targetPlot6').append(htmlPlot);
+            }
+          }
+        }
+        </script>
+    </div>
+    <hr>
+    {% endfor %}
+  </div>
+
+  <div class="row">
+    {% for dataRes in dataRes_tres %}
+    <script languaje="javascript" type="text/javascript">
+      var con = {{ forloop.counter }};
+      con = con + 6;
+      var html = '<input type="text" id="fname'+con+'" name="fname'+con+'">';
+    </script>
+      <div class="card border-danger mb-3" style="width: 18rem;">
+        <div class="card-body text-danger">
+          <h5 class="card-title">Con posible evento de  epilepsia</h5>
+          <p class="card-text">Se identificaron un posible eventos de epliepsia</p>
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for data in dataRes %}
+            <li class="list-group-item">{{data}} </li>
+              <div id='target'></div>
+            {% if 'EGG' in data %}
+              <script languaje="javascript" type="text/javascript">
+                $('#target').append(html);
+                var row_data = "{{ data }}";
+                if($(fname7).val() == ""){
+                  $(fname7).val(row_data)
+                }
+                else{
+                  if($(fname8).val() == ""){
+                    $(fname8).val(row_data)
+                  }
+                  else{
+                    $(fname9).val(row_data)
+                  }
+                }
+                $(fname7).hide();$(fname8).hide();$(fname9).hide();
+              </script>
+            {% endif %}
+          {% endfor %}
+        </ul>
+        <div id='targetPlot7'></div>
+        <div id='targetPlot8'></div>
+        <div id='targetPlot9'></div>
+          <script languaje="javascript" type="text/javascript">
+          
+          var htmlPlot = "<form method='get' action='{% url 'plot' user  password  %}' id="+
+                            '"plotstart'+con+'">'+ 
+                            "<div class='card-body'>"+
+                              "<button type='submit' data-toggle='modal' data-target='#exampleModal' class='btn btn-primary'>EEG</button>"+
+                            "</div>"+
+                          "</form>"
+          if($("#targetPlot7").html()==""){
+            $('#targetPlot7').append(htmlPlot);
+            $("#targetPlot8").remove();
+            $("#targetPlot9").remove();
+          }
+          else{
+            if($("#targetPlot8").html()==""){
+              $('#targetPlot8').append(htmlPlot);
+              $("#targetPlot9").remove();
+            }
+            else{
+              if($("#targetPlot9").html()==""){
+                $('#targetPlot9').append(htmlPlot);
+              }
+            }
+          }
+          </script>
+        </div>
+      <hr>
+    {% endfor %}
+  </div>
+  <hr>
+  <div class="container"></div>
+  <br/>
+  <br/>
+  
+</div>
+
+<script languaje="javascript" type="text/javascript">
+
+  $(document).ready(function(){
+    $("#plot").submit(function(e){
+      e.preventDefault();
+
+      $.ajax({
+        url: $(this).attr('action'),
+        type: $(this).attr('method'),
+        data: { field1: $(fname).val()},
+       
+        success: function(data){
+          $("#image").attr('src', 'data:image/jpeg;base64,' + data);
+        }
+
+      })
+    })
+
+    $("#plotstart7").submit(function(e){
+      console.log('FLUJO 7');
+      e.preventDefault();
+      $(fname).val($(fname7).val())
+
+      $.ajax({
+        url: $(this).attr('action'),
+        type: $(this).attr('method'),
+        data: { field1: $(fname7).val()},
+       
+        success: function(data){
+          $("#image").attr('src', 'data:image/jpeg;base64,' + data);
+        }
+
+      })
+    })
+
+    $("#plotstart8").submit(function(e){
+      console.log('FLUJO 8');
+      e.preventDefault();
+      $(fname).val($(fname8).val())
+
+      $.ajax({
+        url: $(this).attr('action'),
+        type: $(this).attr('method'),
+        data: { field1: $(fname8).val()},
+       
+        success: function(data){
+          $("#image").attr('src', 'data:image/jpeg;base64,' + data);
+        }
+
+      })
+    })
+
+    $("#plotstart9").submit(function(e){
+      console.log('FLUJO 9');
+      e.preventDefault();
+      $(fname).val($(fname9).val())
+
+      $.ajax({
+        url: $(this).attr('action'),
+        type: $(this).attr('method'),
+        data: { field1: $(fnam9).val()},
+       
+        success: function(data){
+          $("#image").attr('src', 'data:image/jpeg;base64,' + data);
+        }
+
+      })
+    })
+
+    //********************************************************************************************************//
+    $("#plotstart4").submit(function(e){
+      console.log('FLUJO 4');
+      e.preventDefault();
+      $(fname).val($(fname4).val())
+
+      $.ajax({
+        url: $(this).attr('action'),
+        type: $(this).attr('method'),
+        data: { field1: $(fname4).val()},
+       
+        success: function(data){
+          $("#image").attr('src', 'data:image/jpeg;base64,' + data);
+        }
+
+      })
+    })
+
+    $("#plotstart5").submit(function(e){
+      console.log('FLUJO 5');
+      e.preventDefault();
+      $(fname).val($(fname5).val())
+
+      $.ajax({
+        url: $(this).attr('action'),
+        type: $(this).attr('method'),
+        data: { field1: $(fname5).val()},
+       
+        success: function(data){
+          $("#image").attr('src', 'data:image/jpeg;base64,' + data);
+        }
+
+      })
+    })
+
+    $("#plotstart6").submit(function(e){
+      console.log('FLUJO 6');
+      e.preventDefault();
+      $(fname).val($(fname6).val())
+
+      $.ajax({
+        url: $(this).attr('action'),
+        type: $(this).attr('method'),
+        data: { field1: $(fnam6).val()},
+       
+        success: function(data){
+          $("#image").attr('src', 'data:image/jpeg;base64,' + data);
+        }
+
+      })
+    })
+
+    //********************************************************************************************************//
+
+    $("#plotstart1").submit(function(e){
+      console.log('FLUJO 1');
+      e.preventDefault();
+      $(fname).val($(fname1).val())
+
+      $.ajax({
+        url: $(this).attr('action'),
+        type: $(this).attr('method'),
+        data: { field1: $(fname1).val()},
+       
+        success: function(data){
+          $("#image").attr('src', 'data:image/jpeg;base64,' + data);
+        }
+
+      })
+    })
+
+    $("#plotstart2").submit(function(e){
+      console.log('FLUJO 2');
+      e.preventDefault();
+      $(fname).val($(fname2).val())
+
+      $.ajax({
+        url: $(this).attr('action'),
+        type: $(this).attr('method'),
+        data: { field1: $(fname2).val()},
+       
+        success: function(data){
+          $("#image").attr('src', 'data:image/jpeg;base64,' + data);
+        }
+
+      })
+    })
+
+    $("#plotstart3").submit(function(e){
+      console.log('FLUJO 3');
+      e.preventDefault();
+      $(fname).val($(fname3).val())
+
+      $.ajax({
+        url: $(this).attr('action'),
+        type: $(this).attr('method'),
+        data: { field1: $(fnam3).val()},
+       
+        success: function(data){
+          $("#image").attr('src', 'data:image/jpeg;base64,' + data);
+        }
+
+      })
+    })
+  })
+
+</script>
+
+{% endblock %}

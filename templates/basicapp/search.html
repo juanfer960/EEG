@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body_block %}
+<style type="text/css">
+  .input-group.md-form.form-sm.form-1 input{
+    border: 1px solid #bdbdbd;
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+  }
+  .input-group.md-form.form-sm.form-2 input {
+    border: 1px solid #bdbdbd;
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+  }
+  .input-group.md-form.form-sm.form-2 input.red-border {
+    border: 1px solid #ef9a9a;
+  }
+  .input-group.md-form.form-sm.form-2 input.lime-border {
+    border: 1px solid #cddc39;
+  }
+  .input-group.md-form.form-sm.form-2 input.amber-border {
+    border: 1px solid #ffca28;
+  }
+
+  form {
+  text-align: center;
+  }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<br/>
+<br/>
+<h2>Cargar archivo en formato EDF para su análisis</h2>
+<br/>
+<br/>
+<div class="container"> 
+    <hr>
+    <form method="post" enctype="multipart/form-data"  action="{% url 'fileSerch'  user  password %}" >
+        <div class="form-group" >
+          <table WIDTH="90%">
+            {{ form.as_table}}
+            {% csrf_token %}
+          </table>
+        </div>
+        <br/>
+        <hr>
+        <label for="file" class="btn aqua-gradient btn-rounded btn-sm my-0">Seleccionar archivo</label>
+        <input type="file" id="file" style="visibility:hidden;" name="document">
+        <button class="btn aqua-gradient btn-rounded btn-sm my-0" type="submit"  id="text">Cargar archivo</button>
+    </form>
+    <hr>
+    <br/>
+    {% if URL %}
+    <div class="alert alert-success" role="alert">
+      {{URL}}
+    </div>    
+    {% endif%}
+</div>
+
+<script languaje="javascript" type="text/javascript">
+
+  $("#file").change(function() {
+    filename = this.files[0].name
+    $( "input[name  ='archivo']" ).val( filename );
+    console.log(filename);
+  });
+</script>
+
+{% endblock %}
+
